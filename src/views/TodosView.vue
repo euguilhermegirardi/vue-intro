@@ -1,11 +1,23 @@
 <script setup>
-import { ref } from "vue"
+import { computed, ref, watch } from "vue"
 import TodoCreator from "../components/TodoCreator.vue"
 import { uid } from "uid"
 import TodoItem from "../components/TodoItem.vue"
 import { Icon } from "@iconify/vue"
 
 const todoList = ref([])
+
+watch(
+  todoList,
+  () => {
+    setTodoListToLocalStorage()
+  },
+  { deep: true }
+)
+
+const todoCompleted = computed(() => {
+  return todoList.value.every((todo) => todo.isCompleted)
+})
 
 const fetchTodoList = () => {
   const savedTodoList = JSON.parse(
@@ -33,36 +45,26 @@ const createTodo = (todo) => {
     isCompleted: null,
     isEditing: null,
   })
-
-  setTodoListToLocalStorage()
 }
 
 const toggleTodoComplete = (todoPos) => {
   todoList.value[todoPos].isCompleted =
     !todoList.value[todoPos].isCompleted
-
-  setTodoListToLocalStorage()
 }
 
 const toggleEditTodo = (todoPos) => {
   todoList.value[todoPos].isEditing =
     !todoList.value[todoPos].isEditing
-
-  setTodoListToLocalStorage()
 }
 
 const updateTodo = (todoValue, todoPos) => {
   todoList.value[todoPos].todo = todoValue
-
-  setTodoListToLocalStorage()
 }
 
 const deleteTodo = (todoId) => {
   todoList.value = todoList.value.filter(
     (todo) => todo.id !== todoId
   )
-
-  setTodoListToLocalStorage()
 }
 </script>
 
@@ -88,6 +90,13 @@ const deleteTodo = (todoId) => {
         width="22"
       />
       <span>You have no todos to complete! Add one!</span>
+    </p>
+    <p
+      v-if="todoCompleted && todoList.length > 0"
+      class="todos-msg"
+    >
+      <Icon icon="noto-v1:party-popper" />
+      <span>You have completed all your todos!</span>
     </p>
   </main>
 </template>
