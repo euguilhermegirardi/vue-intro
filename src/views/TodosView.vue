@@ -7,6 +7,25 @@ import { Icon } from "@iconify/vue"
 
 const todoList = ref([])
 
+const fetchTodoList = () => {
+  const savedTodoList = JSON.parse(
+    localStorage.getItem("todoList")
+  )
+
+  if (savedTodoList) {
+    todoList.value = savedTodoList
+  }
+}
+
+fetchTodoList()
+
+const setTodoListToLocalStorage = () => {
+  localStorage.setItem(
+    "todoList",
+    JSON.stringify(todoList.value)
+  )
+}
+
 const createTodo = (todo) => {
   todoList.value.push({
     id: uid(),
@@ -14,26 +33,36 @@ const createTodo = (todo) => {
     isCompleted: null,
     isEditing: null,
   })
+
+  setTodoListToLocalStorage()
 }
 
 const toggleTodoComplete = (todoPos) => {
   todoList.value[todoPos].isCompleted =
     !todoList.value[todoPos].isCompleted
+
+  setTodoListToLocalStorage()
 }
 
 const toggleEditTodo = (todoPos) => {
   todoList.value[todoPos].isEditing =
     !todoList.value[todoPos].isEditing
+
+  setTodoListToLocalStorage()
 }
 
 const updateTodo = (todoValue, todoPos) => {
   todoList.value[todoPos].todo = todoValue
+
+  setTodoListToLocalStorage()
 }
 
 const deleteTodo = (todoId) => {
   todoList.value = todoList.value.filter(
     (todo) => todo.id !== todoId
   )
+
+  setTodoListToLocalStorage()
 }
 </script>
 
